@@ -18,7 +18,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 class PostListCreateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    queryset = Post.objects.all().order_by('-created_at')
+    queryset = Post.objects.all()
 
     def get(self, request):
         posts = Post.objects.filter(is_published=True) if not request.user.is_authenticated else Post.objects.all()
@@ -37,8 +37,8 @@ class PostListCreateAPIView(APIView):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            return Post.objects.all().order_by('-created_at')
-        return Post.objects.filter(is_published=True).order_by('-created_at')
+            return Post.objects.all()
+        return Post.objects.filter(is_published=True)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -105,6 +105,7 @@ class CommentListCreateAPIView(APIView):
 
 
 class RegisterAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
